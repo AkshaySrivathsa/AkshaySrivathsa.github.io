@@ -463,7 +463,7 @@ pnpm dlx @lhci/cli autorun --collect.url=http://localhost:4173
 
 ## Notes & gotchas
 
-- **Privacy rule respected throughout** — no mention of any private project, trading, broker, MT5, or related terms anywhere in code, data, or copy. Audit `data/projects.ts` and `data/experience.ts` for nothing but the two freelance items and two public projects listed above.
+- **Privacy rule respected throughout** — no mention of any private projects or proprietary tools anywhere in code, data, or copy. Audit `data/projects.ts` and `data/experience.ts` for nothing but the two freelance items and two public projects listed above.
 - **Mysore vs Bangalore** — current narrative places Akshay in Mysore but uses a generic city skyline. Decide: either source a Bangalore/Mysore cityscape image, or change `SectionMeta` "here" tags for Skills/Education/Contact to drop the city name.
 - **R3F is kept installed** but unreferenced. Strip it from the bundle by removing from `package.json` if you confirm you don't need it; saves ~150KB gzipped.
 - **Framer Motion** is used only for `Reveal` (entry transitions). If `motion/react` feels heavy for that one use, replace with a 6-line IntersectionObserver hook + CSS class swap — there's a pure-CSS version in the prototype.
