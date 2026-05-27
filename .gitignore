@@ -1,0 +1,17 @@
+.gitnexus/
+node_modules/
+venv/
+.venv/
+__pycache__/
+outputs/
+models/
+restore_points/
+MT5_Wine/
+drive_c/
+ComfyUI/
+.cache/
+logs/
+cars-assets/*.fbx
+cars-assets/aston.fbx
+cars-assets/benz.fbx
+cars-assets/mclaren/
