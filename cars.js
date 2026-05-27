@@ -19,7 +19,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.10;
+renderer.toneMappingExposure = 0.90;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
@@ -53,9 +53,9 @@ const _bloomHideList = [];   // transparent non-bloom meshes (fog planes, glass)
 
 const _bloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio),
-  0.65,  // strength
-  0.55,  // radius — larger = softer, wider glow; prevents hard circles
-  0.0    // threshold — emissive-only objects bloom
+  0.40,  // strength
+  0.28,  // radius
+  0.0    // threshold
 );
 const _bloomComposer = new EffectComposer(renderer);
 _bloomComposer.renderToScreen = false;
