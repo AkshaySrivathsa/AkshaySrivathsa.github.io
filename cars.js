@@ -649,8 +649,27 @@ new FBXLoader().load(
       }, 2600);
     }, 300); // brief pause so scanner beam reaches bottom
   },
-  xhr => { if (xhr.total) barEl.style.width = (xhr.loaded / xhr.total * 100) + '%'; },
-  err => console.error(err)
+  xhr => {
+    const pctEl = document.getElementById('load-pct');
+    const titleEl = document.getElementById('loading-title');
+    if (xhr.lengthComputable && xhr.total) {
+      const pct = Math.round(xhr.loaded / xhr.total * 100);
+      barEl.style.width = pct + '%';
+      if (pctEl) pctEl.textContent = pct + '%';
+    } else {
+      // GitHub Releases doesn't send Content-Length — animate bar and show MB
+      const mb = (xhr.loaded / 1048576).toFixed(1);
+      const fakePct = Math.min(90, (xhr.loaded / (159 * 1048576)) * 90);
+      barEl.style.width = fakePct + '%';
+      if (pctEl) pctEl.textContent = mb + ' MB';
+      if (titleEl) titleEl.textContent = 'DOWNLOADING 3D MODEL…';
+    }
+  },
+  err => {
+    console.error(err);
+    const titleEl = document.getElementById('loading-title');
+    if (titleEl) titleEl.textContent = 'LOAD ERROR — CHECK CONSOLE';
+  }
 );
 
 // ─── Cinematic camera ─────────────────────────────────────────────────────────
