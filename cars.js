@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { FBXLoader }       from 'three/addons/loaders/FBXLoader.js';
+import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader }     from 'three/addons/loaders/DRACOLoader.js';
 import { FontLoader }      from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry }    from 'three/addons/geometries/TextGeometry.js';
 import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
@@ -519,9 +520,15 @@ const scrollHint = document.getElementById('scroll-hint');
 
 const plateMeshRefs = [];
 
-new FBXLoader().load(
-  'https://github.com/AkshaySrivathsa/AkshaySrivathsa.github.io/releases/download/v1.0-assets/porsche.fbx',
-  fbx => {
+const _draco = new DRACOLoader();
+_draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+const _gltfLoader = new GLTFLoader();
+_gltfLoader.setDRACOLoader(_draco);
+
+_gltfLoader.load(
+  'cars-assets/porsche.glb',
+  gltf => {
+    const fbx = gltf.scene;
     fbx.traverse(child => {
       if (!child.isMesh) return;
 
@@ -651,18 +658,10 @@ new FBXLoader().load(
   },
   xhr => {
     const pctEl = document.getElementById('load-pct');
-    const titleEl = document.getElementById('loading-title');
     if (xhr.lengthComputable && xhr.total) {
       const pct = Math.round(xhr.loaded / xhr.total * 100);
       barEl.style.width = pct + '%';
       if (pctEl) pctEl.textContent = pct + '%';
-    } else {
-      // GitHub Releases doesn't send Content-Length — animate bar and show MB
-      const mb = (xhr.loaded / 1048576).toFixed(1);
-      const fakePct = Math.min(90, (xhr.loaded / (159 * 1048576)) * 90);
-      barEl.style.width = fakePct + '%';
-      if (pctEl) pctEl.textContent = mb + ' MB';
-      if (titleEl) titleEl.textContent = 'DOWNLOADING 3D MODEL…';
     }
   },
   err => {
