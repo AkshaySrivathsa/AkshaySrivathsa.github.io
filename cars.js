@@ -520,7 +520,7 @@ const scrollHint = document.getElementById('scroll-hint');
 const plateMeshRefs = [];
 
 new FBXLoader().load(
-  'cars-assets/porsche.fbx',
+  'https://github.com/AkshaySrivathsa/AkshaySrivathsa.github.io/releases/download/v1.0-assets/porsche.fbx',
   fbx => {
     fbx.traverse(child => {
       if (!child.isMesh) return;
