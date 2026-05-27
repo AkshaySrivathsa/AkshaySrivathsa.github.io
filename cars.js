@@ -9,6 +9,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass }              from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass }              from 'three/addons/postprocessing/OutputPass.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { RGBELoader }               from 'three/addons/loaders/RGBELoader.js';
 
 // ─── Renderer ────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('c');
@@ -24,6 +25,15 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
+
+// HDR environment map — gives metallic/glass reflections
+const _pmrem = new THREE.PMREMGenerator(renderer);
+_pmrem.compileEquirectangularShader();
+new RGBELoader().load('cars-assets/rogland_clear_night_2k.hdr', hdr => {
+  scene.environment = _pmrem.fromEquirectangular(hdr).texture;
+  hdr.dispose();
+  _pmrem.dispose();
+});
 // Scene-level depth fog — car orbit is 130-200 units from camera, near=350 keeps it fully clear.
 // Stars at 2800 units fade ~80%. Anything past 3800 is completely misted.
 scene.fog = new THREE.Fog(new THREE.Color(0.012, 0.004, 0.040), 350, 3800);
@@ -42,10 +52,10 @@ const _bloomDarkList = [];   // { mesh, mat } — opaque non-bloom meshes
 const _bloomHideList = [];   // transparent non-bloom meshes (fog planes, glass)
 
 const _bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.55,  // strength
-  0.18,  // wider radius — gives stars visible glow halo
-  0.0
+  new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio),
+  0.65,  // strength
+  0.55,  // radius — larger = softer, wider glow; prevents hard circles
+  0.0    // threshold — emissive-only objects bloom
 );
 const _bloomComposer = new EffectComposer(renderer);
 _bloomComposer.renderToScreen = false;
@@ -337,12 +347,12 @@ const matGlass = new THREE.MeshPhysicalMaterial({
   thickness:       3.0,
   ior:             1.52,
   reflectivity:    0.50,
-  envMapIntensity: 0.5,
+  envMapIntensity: 1.8,
   transparent:     true,
   opacity:         1.0,
   side:            THREE.DoubleSide,
   depthWrite:      false,
-  fog:             false,   // scene fog must never tint the glass
+  fog:             false,
 });
 
 const matRubber = new THREE.MeshStandardMaterial({
@@ -351,8 +361,8 @@ const matRubber = new THREE.MeshStandardMaterial({
 });
 
 const matRim = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.22, 0.22, 0.28),
-  metalness: 0.82, roughness: 0.20,
+  color: new THREE.Color(0.55, 0.55, 0.55),
+  metalness: 0.95, roughness: 0.12,
 });
 
 const matBrakeDisc = new THREE.MeshStandardMaterial({
@@ -689,7 +699,7 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  _bloomComposer.setSize(window.innerWidth, window.innerHeight);
+  _bloomComposer.setSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
   _finalComposer.setSize(window.innerWidth, window.innerHeight);
   _msaaTarget.setSize(
     window.innerWidth  * window.devicePixelRatio,
