@@ -264,7 +264,7 @@ scene.add(_fillLight);
 scene.add(_fillLight.target);
 
 // ─── Materials ────────────────────────────────────────────────────────────────
-// ── Carbon fiber canvas — finer weave (8px cells, 16×16 grid in 128px) ───────
+// ── Carbon fiber canvas ───────────────────────────────────────────────────────
 const _cf = document.createElement('canvas');
 _cf.width = _cf.height = 128;
 const _cx = _cf.getContext('2d');
@@ -331,196 +331,170 @@ function addTriplanar(mat, tex, scl, intensity = 1.0, additive = false) {
   };
 }
 
-// Body: #170120 midnight purple — metallic with deep reflections
+// ── Corvette Stingray — Torch Red metallic paint ──────────────────────────────
 const matBody = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.040, 0.002, 0.065),
-  metalness: 0.82, roughness: 0.20,
+  color: new THREE.Color(0.72, 0.02, 0.03),   // Torch Red
+  metalness: 0.85, roughness: 0.18,
   side: THREE.DoubleSide,
 });
-addTriplanar(matBody, cfTex, 7.0, 0.28, true);
+addTriplanar(matBody, cfTex, 8.0, 0.12, true); // subtle carbon flake in paint
 
-const matGlass = new THREE.MeshPhysicalMaterial({
-  color:           new THREE.Color(0.94, 0.97, 1.0),
-  metalness:       0.0,
-  roughness:       0.04,
-  transmission:    0.92,
-  thickness:       3.0,
-  ior:             1.52,
-  reflectivity:    0.50,
-  envMapIntensity: 1.8,
-  transparent:     true,
-  opacity:         1.0,
-  side:            THREE.DoubleSide,
-  depthWrite:      false,
-  fog:             false,
+// Secondary / accent panels — darker red-black
+const matBody2 = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.32, 0.01, 0.01),
+  metalness: 0.80, roughness: 0.25,
+  side: THREE.DoubleSide,
 });
 
+// Gloss black body panels & plastic
+const matBlack = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.025, 0.025, 0.028),
+  metalness: 0.10, roughness: 0.30,
+  side: THREE.DoubleSide,
+});
+
+// Matte black bumpy plastic (sills, diffuser trim)
+const matPlastic = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.04, 0.04, 0.045),
+  metalness: 0.0, roughness: 0.88,
+});
+
+// Tyres
 const matRubber = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.028, 0.028, 0.032),
-  metalness: 0, roughness: 0.94,
+  color: new THREE.Color(0.025, 0.025, 0.028),
+  metalness: 0.0, roughness: 0.95,
 });
 
+// Rims — gunmetal dark chrome
 const matRim = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.55, 0.55, 0.55),
-  metalness: 0.95, roughness: 0.12,
-});
-
-const matBrakeDisc = new THREE.MeshStandardMaterial({
   color: new THREE.Color(0.18, 0.18, 0.20),
-  metalness: 0.90, roughness: 0.35,
+  metalness: 0.96, roughness: 0.10,
 });
 
+// Brake discs — ventilated steel
+const matBrakeDisc = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.42, 0.40, 0.38),
+  metalness: 0.90, roughness: 0.40,
+});
+
+// Brake hub/caliper — bright yellow
+const matBrakeHub = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.82, 0.68, 0.02),
+  metalness: 0.3, roughness: 0.45,
+});
+
+// Chrome trim
+const matChrome = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.82, 0.82, 0.85),
+  metalness: 0.99, roughness: 0.04,
+});
+addTriplanar(matChrome, smTex, 10.0, 0.35, false);
+
+// Headlight — white emissive, bloomed
 const matHead = new THREE.MeshStandardMaterial({
-  color: 0xdde8ff,
-  emissive: new THREE.Color(0xdde8ff),
-  emissiveIntensity: 0.25,
-  roughness: 0.05, metalness: 0.0,
-});
-
-const matBrake = new THREE.MeshStandardMaterial({
-  color: 0xcc0000,
-  emissive: new THREE.Color(0xcc0000),
-  emissiveIntensity: 2.0,
+  color: new THREE.Color(1.0, 0.97, 0.90),
+  emissive: new THREE.Color(1.0, 0.97, 0.90),
+  emissiveIntensity: 1.8,
   roughness: 0.0, metalness: 0.0,
 });
 
-const matChrome = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.72, 0.72, 0.75),
-  metalness: 0.98, roughness: 0.06,
-});
-
-// Brake/tail light cover — deep red tint, lets the dark red emissive bleed through
-const matTailCover = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.35, 0.0, 0.0),
-  roughness: 0.04, metalness: 0.05,
-  transparent: true, opacity: 0.40,
+// Unlit light (off-state)
+const matLightOff = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.08, 0.08, 0.10),
+  roughness: 0.15, metalness: 0.4,
+  transparent: true, opacity: 0.55,
   side: THREE.DoubleSide,
 });
 
-// Headlight cover/lens — near-clear so the white LEDs show through
-const matHeadCover = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.88, 0.92, 1.0),
-  roughness: 0.04, metalness: 0.05,
-  transparent: true, opacity: 0.22,
-  side: THREE.DoubleSide,
+// Clear glass — windshield & side windows
+const matGlassClear = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color(0.88, 0.95, 1.0),
+  metalness: 0.0, roughness: 0.02,
+  transmission: 0.90, thickness: 4.0, ior: 1.52,
+  reflectivity: 0.55, envMapIntensity: 2.0,
+  transparent: true, opacity: 1.0,
+  side: THREE.DoubleSide, depthWrite: false, fog: false,
 });
 
-// Brushed silver steel — used on bumpers, spoiler, trim
-const matSteel = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.55, 0.55, 0.58),
-  metalness: 0.88, roughness: 0.22,
-});
-addTriplanar(matSteel, smTex, 12.0, 0.55, false);
-
-
-// ─── Number plate — image texture ────────────────────────────────────────────
-const _plateTex = new THREE.TextureLoader().load('cars-assets/plate-akshay.png');
-_plateTex.flipY = false;
-_plateTex.anisotropy = 16;
-
-const matPlate = new THREE.MeshStandardMaterial({
-  map: _plateTex,
-  roughness: 0.40,
-  metalness: 0.0,
-  side: THREE.DoubleSide,
+// Tinted windshield
+const matGlassTinted = new THREE.MeshPhysicalMaterial({
+  color: new THREE.Color(0.12, 0.18, 0.22),
+  metalness: 0.0, roughness: 0.04,
+  transmission: 0.55, thickness: 6.0, ior: 1.52,
+  reflectivity: 0.65, envMapIntensity: 2.2,
+  transparent: true, opacity: 0.80,
+  side: THREE.DoubleSide, depthWrite: false, fog: false,
 });
 
-// ─── Porsche crest emblem ─────────────────────────────────────────────────────
-const _emblemTex = new THREE.TextureLoader().load('cars-assets/porsche-logo.png');
-_emblemTex.anisotropy = 16;
-// Crest image is ~1:1.15 (w:h). Compress the U axis so it doesn't appear wide on the mesh.
-_emblemTex.repeat.set(0.82, 1.0);
-_emblemTex.offset.set(0.09, 0);
-
-const matEmblem = new THREE.MeshStandardMaterial({
-  map: _emblemTex,
-  roughness: 0.25,
-  metalness: 0.55,
-  transparent: true,
-  alphaTest: 0.1,
-  side: THREE.DoubleSide,
+// Red tail/brake-light glass — strong emissive so it blooms visibly
+const matGlassRed = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(1.0, 0.0, 0.0),
+  emissive: new THREE.Color(1.0, 0.0, 0.0),
+  emissiveIntensity: 3.5,
+  roughness: 0.05, metalness: 0.0,
+  transparent: true, opacity: 0.75,
+  side: THREE.DoubleSide, depthWrite: false,
 });
 
-// ─── Rear chrome lettering material ──────────────────────────────────────────
-const matChromeLetters = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.88, 0.88, 0.92),
-  metalness: 0.97,
-  roughness: 0.06,
+// Orange indicator glass — warm glow, less intense than brake lights
+const matGlassOrange = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(1.0, 0.45, 0.0),
+  emissive: new THREE.Color(1.0, 0.45, 0.0),
+  emissiveIntensity: 1.2,
+  roughness: 0.08, metalness: 0.0,
+  transparent: true, opacity: 0.70,
+  side: THREE.DoubleSide, depthWrite: false,
 });
 
-// ─── Interior: dark matte red ─────────────────────────────────────────────────
+// Interior — red leather
 const matInterior = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.40, 0.005, 0.010),
-  roughness: 0.88, metalness: 0.0,
+  color: new THREE.Color(0.38, 0.008, 0.008),
+  roughness: 0.85, metalness: 0.0,
   side: THREE.DoubleSide,
 });
 
-// ─── Steering wheel: matte black ─────────────────────────────────────────────
+// Steering wheel — matte black with carbon
 const matSteering = new THREE.MeshStandardMaterial({
   color: new THREE.Color(0.04, 0.04, 0.04),
-  roughness: 0.65, metalness: 0.05,
+  roughness: 0.60, metalness: 0.05,
+});
+addTriplanar(matSteering, cfTex, 5.0, 0.45, true);
+
+// Window border trim — gloss black
+const matWindowBorder = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.03, 0.03, 0.03),
+  metalness: 0.2, roughness: 0.25,
 });
 
-// ─── Name-based classification ────────────────────────────────────────────────
-function classify(name) {
-  // Glass panels
-  if (/glass|windshield|wind\d|tinted|side.?glass/i.test(name)) return 'glass';
-
-  // Front headlight emissives (white) — rfog excluded (rear fog lights, not front)
-  if (/headlightled|headlightmain|headlightstroke|frontfoglight$|foglight(?!cover)/i.test(name)
-      && !/rear|brake|reverse|rfog/i.test(name)) return 'head';
-
-  // Red rear brake / tail lights
-  if (/brakelight(?!cover)|rmonol|taillight/i.test(name)) return 'brake';
-
-  // Rear fog lights → chrome trim (not orange)
-  if (/^rfoglights?$/i.test(name)) return 'chrome';
-
-  // Reverse lights → chrome (not active in showcase)
-  if (/reverselight(?!cover)|reverselightpat/i.test(name)) return 'chrome';
-
-  // Brake / tail light covers → dark red transparent
-  if (/brakelightcover|rearmonolightcover|rearmono.*cover/i.test(name)) return 'tailcover';
-
-  // Headlight covers and lenses → near-clear transparent
-  if (/headlightcover|headlightlen|headlightlens|headlightbase/i.test(name)) return 'headcover';
-
-  // Steering wheel → matte black
-  if (/steering|SteeringWheel/i.test(name)) return 'steering';
-
-  // Interior surfaces → formula red
-  if (/seat|interior|dashboard|dash|console|carpet|trim|panel|door.*inner|inner.*door|cabin|upholster/i.test(name)) return 'interior';
-
-  // Front grilles, vents, mesh inserts → metallic silver (not purple)
-  if (/grille|grill|FrontGrid|FrontMesh|bumper.*vent|vent.*bumper|intake(?!Frame)|FrontAir|grillmesh|gridmesh/i.test(name)) return 'chrome';
-
-  // Rear diffuser / lower rear extension → metallic silver
-  if (/diffuser|splitter|rearApron|rearLip|rearDif|rear.*lip|rear.*skirt|RearBottom|RearLower/i.test(name)) return 'chrome';
-
-  // Chrome / silver: mirrors, exhaust, logos, fog covers, door handles, intake frames
-  if (/mirror|exhaust|lightlogo|fogcover|^handles$|airIntakeFrame/i.test(name)) return 'chrome';
-
-  // Brushed steel: shields, skirts, sills, door trim
-  if (/shield|DoorShiel|LowerShield/i.test(name)) return 'steel';
-
-  // Rims
-  if (/rim|wrim/i.test(name)) return 'rim';
-
-  // Tyres
-  if (/^tire|tirefl|tirefr|tirerl|tirerr/i.test(name)) return 'rubber';
-
-  // Brake discs
-  if (/brakedisc/i.test(name)) return 'disc';
-
-  // Porsche crest emblem
-  if (/^Logo$|^logo$|^MainLogo$/i.test(name)) return 'emblem';
-
-  // Number plates
-  if (/^NumberF$|^NumberR$|^Reg_/i.test(name)) return 'plate';
-
-  // Everything else (bumpers, spoiler, hood, doors, roof) → carbon fiber body
+// ─── Material-name classification (matches GLB embedded material names) ────────
+function classify(matName) {
+  const n = matName || '';
+  if (/Car_Paint_Main/i.test(n))        return 'body';
+  if (/Car_Paint_Secondary/i.test(n))   return 'body2';
+  if (/Car_Painnt_Black|Black_Diffuse|Metal_Black(?!_Rough)/i.test(n)) return 'black';
+  if (/Plastic_Black/i.test(n))         return 'plastic';
+  if (/Metal.Black.Rough/i.test(n))     return 'black';
+  if (/Rubber|Tire/i.test(n))           return 'rubber';
+  if (/Guide_Rim|Rim/i.test(n))         return 'rim';
+  if (/Chrome_Dark/i.test(n))           return 'rim';
+  if (/Chrome/i.test(n))                return 'chrome';
+  if (/Brake_Hub/i.test(n))             return 'brakehub';
+  if (/Brake_Disc/i.test(n))            return 'disc';
+  if (/White_Light_Bulb_ON/i.test(n))   return 'head';
+  if (/Light_Bulb|Side_Light/i.test(n)) return 'lightoff';
+  if (/Glass.*Red|Red.*Glass/i.test(n)) return 'glassred';
+  if (/Glass.*Orange|Orange.*Glass/i.test(n)) return 'glassorange';
+  if (/Glass.*Tinted|Tinted/i.test(n))  return 'glasstinted';
+  if (/Glass/i.test(n))                 return 'glassclear';
+  if (/Interior.*Seat|Seat/i.test(n))   return 'interior';
+  if (/Steering/i.test(n))              return 'steering';
+  if (/Window_Border/i.test(n))         return 'windowborder';
+  if (/Flag_Logo/i.test(n))             return 'chrome';
+  if (/Shadow/i.test(n))                return 'shadow';
   return 'body';
 }
+
+// unused stub kept for lint-safety
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 const loadingEl  = document.getElementById('loading');
@@ -528,53 +502,51 @@ const barEl      = document.getElementById('loading-bar');
 const carNameEl  = document.getElementById('car-name');
 const scrollHint = document.getElementById('scroll-hint');
 
-const plateMeshRefs = [];
-
 const _draco = new DRACOLoader();
 _draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
 const _gltfLoader = new GLTFLoader();
 _gltfLoader.setDRACOLoader(_draco);
 
 _gltfLoader.load(
-  'cars-assets/porsche.glb',
+  'cars-assets/corvette.glb',
   gltf => {
     const fbx = gltf.scene;
     fbx.traverse(child => {
       if (!child.isMesh) return;
 
+      // Shadow planes are invisible geometry — hide them
+      if (/shadow/i.test(child.name)) { child.visible = false; return; }
+
       child.castShadow = true;
       child.receiveShadow = true;
 
-      const type = classify(child.name);
-      switch (type) {
-        case 'glass':  child.material = matGlass;         break;
-        case 'head':
-          child.material = matHead.clone();
-          child.layers.enable(BLOOM_LAYER);
-          break;
-        case 'brake':
-          child.material = matBrake.clone();
-          child.layers.enable(BLOOM_LAYER);
-          break;
-        case 'rim':    child.material = matRim;           break;
-        case 'rubber': child.material = matRubber;        break;
-        case 'disc':   child.material = matBrakeDisc;     break;
-        case 'chrome':     child.material = matChrome;       break;
-        case 'tailcover':  child.material = matTailCover;   break;
-        case 'headcover':  child.material = matHeadCover;   break;
-        case 'steel':    child.material = matSteel;          break;
-        case 'interior': child.material = matInterior;      break;
-        case 'steering': child.material = matSteering;      break;
-        case 'plate':
-          child.visible = false; // replaced by accurate overlay below
-          plateMeshRefs.push(child);
-          break;
-        case 'emblem':
-          child.material = matEmblem;
-          child.scale.setScalar(1.6);
-          break;
-        default:       child.material = matBody;           break;
-      }
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      const newMats = mats.map(mat => {
+        const type = classify(mat ? mat.name : '');
+        switch (type) {
+          case 'body':         return matBody;
+          case 'body2':        return matBody2;
+          case 'black':        return matBlack;
+          case 'plastic':      return matPlastic;
+          case 'rubber':       return matRubber;
+          case 'rim':          return matRim;
+          case 'disc':         return matBrakeDisc;
+          case 'brakehub':     return matBrakeHub;
+          case 'chrome':       return matChrome;
+          case 'glassclear':   return matGlassClear;
+          case 'glasstinted':  return matGlassTinted;
+          case 'glassred':     { child.layers.enable(BLOOM_LAYER); return matGlassRed; }
+          case 'glassorange':  { child.layers.enable(BLOOM_LAYER); return matGlassOrange; }
+          case 'interior':     return matInterior;
+          case 'steering':     return matSteering;
+          case 'windowborder': return matWindowBorder;
+          case 'head':         { child.layers.enable(BLOOM_LAYER); return matHead; }
+          case 'lightoff':     return matLightOff;
+          case 'shadow':       { child.visible = false; return mat; }
+          default:             return matBody;
+        }
+      });
+      child.material = newMats.length === 1 ? newMats[0] : newMats;
     });
 
     const b2  = new THREE.Box3().setFromObject(fbx);
@@ -609,43 +581,6 @@ _gltfLoader.load(
       _fogShafts.push(_mkLightCone(new THREE.Vector3(-hX, hY,  fZ), headRx, new THREE.Color(0.78, 0.90, 1.0), 0.038, rY));
       _fogShafts.push(_mkLightCone(new THREE.Vector3(  0, hY, -fZ), brakeRx, new THREE.Color(1.0, 0.05, 0.02), 0.026, rY));
     }
-
-    // ── Plate overlays at exact mesh positions ────────────────────────────────
-    fbx.updateMatrixWorld(true);
-
-    const _pTex = new THREE.TextureLoader().load('cars-assets/plate-akshay.png');
-    _pTex.flipY = true;
-
-    plateMeshRefs.forEach(pm => {
-      pm.updateWorldMatrix(true, false);
-
-      const pmBox  = new THREE.Box3().setFromObject(pm);
-      const wPos   = pmBox.getCenter(new THREE.Vector3());
-      const pmSize = pmBox.getSize(new THREE.Vector3());
-      const pmW    = Math.max(pmSize.x, pmSize.z);
-      const pmH    = pmSize.y;
-
-      const pMat = new THREE.MeshStandardMaterial({
-        map: _pTex,
-        roughness: 0.35,
-        metalness: 0.0,
-        side: THREE.FrontSide,
-      });
-
-      const plane = new THREE.Mesh(new THREE.PlaneGeometry(pmW, pmH), pMat);
-
-      const isRear = /NumberR/i.test(pm.name);
-      plane.rotation.y = isRear ? fbx.rotation.y + Math.PI : fbx.rotation.y;
-
-      if (!isRear) return; // skip front plate
-
-      const outDir = new THREE.Vector3(0, 0, -1)
-        .applyAxisAngle(new THREE.Vector3(0, 1, 0), fbx.rotation.y);
-      plane.position.copy(wPos);
-      plane.position.addScaledVector(outDir, 1.5);
-
-      scene.add(plane);
-    });
 
     // Build bloom lists once — avoids scene.traverse every frame
     scene.traverse(obj => {
@@ -689,10 +624,21 @@ let _camAxX = 130, _camAxZ = 200;
 // _smoothProgress: velocity-capped lerp of _rawProgress, drives camera + text
 // Exposed as window._carOrbitProgress so the HTML text animation stays in sync.
 let _rawProgress = 0, _smoothProgress = 0;
-const _ORBIT_H = 4 * window.innerHeight;
+const _ORBIT_H = 3 * window.innerHeight; // matches 300vh orbit-spacer exactly
+
+// Pause/resume the animation loop so section scrolling gets full GPU budget
+let _animPaused = false;
+let _animFrameId = null;
 
 window.addEventListener('scroll', () => {
   _rawProgress = Math.min(window.scrollY / _ORBIT_H, 1);
+  const inSections = window.scrollY > _ORBIT_H * 1.05;
+  if (inSections && !_animPaused) {
+    _animPaused = true;                 // stops the loop after current frame
+  } else if (!inSections && _animPaused) {
+    _animPaused = false;
+    animate();                          // restart loop when scrolling back
+  }
 }, { passive: true });
 
 window.addEventListener('resize', () => {
@@ -709,7 +655,6 @@ window.addEventListener('resize', () => {
 
 let _prevRaf = performance.now();
 function animate() {
-  requestAnimationFrame(animate);
   const _nowRaf = performance.now();
   const _dtRaf  = Math.min((_nowRaf - _prevRaf) / 16.67, 3); // normalised to 60fps
   _prevRaf = _nowRaf;
@@ -748,7 +693,6 @@ function animate() {
   camera.position.set(Math.sin(_cinAR) * _camAxX, 55, Math.cos(_cinAR) * _camAxZ);
   camera.lookAt(0, 46, 0);
 
-  // Bloom pass — use pre-built lists so scene.traverse never runs per-frame
   if (_bloomReady) {
     const _savedBg = scene.background;
     scene.background = _bloomBlack;
@@ -762,5 +706,8 @@ function animate() {
   } else {
     renderer.render(scene, camera);
   }
+
+  // Schedule next frame only if not paused
+  if (!_animPaused) _animFrameId = requestAnimationFrame(animate);
 }
 animate();
