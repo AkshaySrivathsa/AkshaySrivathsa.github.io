@@ -102,9 +102,14 @@ body.ready .rail{ opacity:1; }
 .col{ max-width:520px; }
 .col--r{ justify-self:end; }
 @media(max-width:860px){
-  .row{ grid-template-columns:1fr; min-height:auto; padding:14vh clamp(20px,6vw,40px); gap:0; }
-  .col{ background:rgba(0,0,0,.5); backdrop-filter:blur(3px); border-radius:14px; padding:18px 20px; margin-bottom:18px; }
-  .col--r{ justify-self:stretch; text-align:left !important; }
+  /* single column, each section fills the viewport and centres — like desktop, no cards */
+  .row{ grid-template-columns:1fr; min-height:100vh; min-height:100svh; align-content:center;
+    padding:18vh clamp(20px,7vw,40px) 14vh; gap:18px; }
+  .col,.col--r{ max-width:100%; justify-self:stretch; text-align:left !important; }
+  .col--r .meta{ justify-content:flex-start; }
+  /* readability over the brain — a soft left-weighted veil, NOT per-text cards */
+  body::after{ content:''; position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:linear-gradient(95deg, rgba(0,0,0,.80) 0%, rgba(0,0,0,.42) 58%, rgba(0,0,0,.14) 100%); }
 }
 
 /* text reveal — liquid letter cascade flowing like water */

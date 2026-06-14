@@ -291,7 +291,7 @@ function buildBrain(geo){
   burstGeo.setAttribute('aSize',new THREE.BufferAttribute(bSize,1));
   burstPoints=new THREE.Points(burstGeo,pointMat(mobile?30:42)); burstPoints.frustumCulled=false; brain.add(burstPoints);
 
-  brain.rotation.set(0.08,-0.48,0);
+  brain.rotation.set(0.08,-1.55,0);
   built=true; elapsed=0;
   document.getElementById('loader')?.classList.add('hidden');
   document.body.classList.add('ready');
@@ -348,7 +348,7 @@ function animate(){
   if(!dragging)brain.rotation.y+=dt*0.04;
   brain.rotation.x=lerp(brain.rotation.x,userRotX+ptrY*0.075,0.07);
   brain.position.x=ptrX*0.34;brain.position.y=-scrollSmooth*1.0;
-  brain.scale.setScalar((innerWidth>860?1.12:0.76)+0.01*Math.sin(elapsed*0.8));
+  brain.scale.setScalar((innerWidth>860?1.12:innerWidth>540?0.62:0.5)+0.01*Math.sin(elapsed*0.8));
   brain.updateMatrixWorld(true);
 
   if(pointerInside){_ray.setFromCamera(mouseNDC,camera);if(_ray.ray.intersectPlane(_plane,_cw))halo.position.copy(_cw);}
